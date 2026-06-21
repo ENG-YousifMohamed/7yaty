@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كل اللي بينا ❤️</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #ffdde1;
+            background-image: linear-gradient(180deg, #ffdde1 0%, #ffefef 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+        }
+
+        #app-container {
+            width: 100%;
+            max-width: 850px;
+            min-height: 100vh;
+            background: transparent; 
+            position: relative;
+            box-shadow: none; 
+            display: flex;
+            flex-direction: column;
+            margin: 0 auto;
+            z-index: 2;
+        }
+
+        #music-toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            border: 2px solid #ffccd5;
+            color: #d81b60;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(216, 27, 96, 0.2);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s;
+        }
+        #music-toggle-btn:hover { transform: scale(1.1); background: #ffccd5; }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.4;
+            pointer-events: none;
+            animation: floatUp 4s linear infinite;
+            z-index: 1; 
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.8); opacity: 0.45; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        .app-screen {
+            display: none;
+            width: 100%;
+            min-height: 100vh;
+            padding: 30px 25px;
+            flex-direction: column;
+            align-items: center;
+            z-index: 10;
+            animation: fadeIn 0.4s ease;
+        }
+        .app-screen.active { display: flex; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        #screen-lock { justify-content: center; background: radial-gradient(circle at center, #ffe3e7 0%, #ffd0d7 100%); }
+        .big-heart-wrapper { background: white; width: 100%; max-width: 380px; padding: 40px 25px; border-radius: 40px; box-shadow: 0 15px 35px rgba(255, 140, 158, 0.3); text-align: center; border: 3px solid #ffccd5; }
+        .avatar { width: 85px; height: 85px; border-radius: 50%; object-fit: cover; border: 3px solid #d81b60; margin-bottom: 15px; }
+        .lock-title { color: #4a1c35; font-size: 28px; font-weight: 900; }
+        .lock-sub { color: #d81b60; font-size: 15px; font-weight: 700; margin-bottom: 25px; }
+        .pass-box { text-align: left; width: 100%; margin-bottom: 20px; }
+        .pass-box label { font-size: 12px; color: #888; font-weight: bold; margin-left: 10px; }
+        .pass-box input { width: 100%; padding: 15px; border-radius: 15px; border: 2px solid #ffb6c1; text-align: center; font-size: 16px; outline: none; transition: 0.3s; font-weight: bold; }
+        .pass-box input:focus { border-color: #d81b60; }
+        .btn-pink { background: linear-gradient(45deg, #ff758c, #ff7eb3); color: white; border: none; width: 100%; padding: 15px; border-radius: 15px; font-weight: 900; font-size: 17px; cursor: pointer; box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4); transition: transform 0.2s;}
+        .btn-pink:hover { transform: scale(1.02); }
+
+        .white-card { 
+            background: white; 
+            border-radius: 30px; padding: 40px 30px; width: 100%; max-width: 550px; 
+            box-shadow: 0 10px 30px rgba(216, 27, 96, 0.08); 
+            text-align: center; border: 2px solid #ffe8e8; 
+        }
+
+        #screen-welcome { justify-content: center; }
+
+        #screen-timeline { padding: 0; display: none; background: transparent; }
+        #screen-timeline.active { display: block; }
+        
+        .hero-section { position: relative; width: 100%; height: 340px; }
+        .hero-section img { width: 100%; height: 100%; object-fit: cover; border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; box-shadow: 0 10px 30px rgba(216, 27, 96, 0.12); }
+        .hero-badge { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); background: white; color: #d81b60; font-weight: 900; font-size: 20px; padding: 10px 45px; border-radius: 30px; box-shadow: 0 5px 20px rgba(216, 27, 96, 0.18); border: 2px solid #ffccd5; }
+        
+        .timeline-content { padding: 45px 30px 120px 30px; max-width: 750px; margin: 0 auto; }
+        
+        .counter-container { background: white; border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(216, 27, 96, 0.1); border: 2px solid #ffe3e7; margin-bottom: 35px; text-align: center; }
+        .counter-title { color: #d81b60; font-weight: bold; font-size: 17px; margin-bottom: 20px; }
+        .counter-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .count-box { background: #fff5f6; padding: 15px 5px; border-radius: 18px; border: 1px solid #ffccd5; }
+        .count-box .num { font-size: 26px; font-weight: 900; color: #d81b60; line-height: 1; }
+        .count-box .label { font-size: 13px; color: #888; font-weight: bold; margin-top: 8px; }
+        
+        .timeline-item { background: white; border-radius: 20px; padding: 20px; margin-bottom: 18px; border: 2px solid #ffe3e7; box-shadow: 0 8px 25px rgba(216, 27, 96, 0.08); text-align: right; transition: transform 0.2s;}
+        .timeline-item:hover { transform: translateX(-5px); }
+        .timeline-item h4 { color: #333; font-size: 17px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+        .date-pill { display: inline-block; background: #fff0f3; color: #d81b60; padding: 6px 18px; border-radius: 12px; font-size: 14px; font-weight: 800; border: 1px solid #ffccd5; }
+        
+        /* الألبوم */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 35px; }
+        .gallery-grid img { width: 100%; height: 280px; object-fit: cover; border-radius: 22px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); transition: transform 0.3s; border: 2px solid white;}
+        .gallery-grid img:hover { transform: scale(1.03); }
+
+        /* --- تم إزالة المستطيل الأبيض من هنا تماماً --- */
+        .sticky-footer { 
+            position: fixed; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 100%; 
+            max-width: 400px; 
+            display: flex;
+            justify-content: center;
+            z-index: 100; 
+            background: transparent; /* بدون خلفية */
+            border: none; /* بدون خطوط */
+        }
+
+        #screen-final { justify-content: center; }
+        .msg-list { text-align: center; display: flex; flex-direction: column; gap: 18px; margin: 25px 0; min-height: 200px; justify-content: center;}
+        .msg-list h3 { color: #444; font-size: 20px; font-weight: 800; min-height: 30px; }
+        .btn-outline { background: white; border: 2px solid #d81b60; color: #d81b60; padding: 14px 35px; border-radius: 20px; font-weight: bold; font-size: 17px; cursor: pointer; margin-top: 25px; width: 100%; transition: all 0.5s ease; }
+        .btn-outline:hover { background: #d81b60; color: white; }
+
+        @media (max-width: 600px) {
+            .hero-section { height: 260px; }
+            .white-card { padding: 30px 20px; }
+            .timeline-content { padding: 35px 20px 120px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="background-music" loop>
+        <source src="song.mp3" type="audio/mpeg">
+    </audio>
+
+    <button id="music-toggle-btn" onclick="toggleAudio()">
+        <i class="fa-solid fa-volume-high"></i>
+    </button>
+
+    <div id="app-container">
+
+        <!-- 1. شاشة القفل -->
+        <div id="screen-lock" class="app-screen active">
+            <div class="big-heart-wrapper">
+                <img src="https://cdn.discordapp.com/attachments/711816136089403453/1517958118292586617/artworks-ZVyl8v8hEd5AfpS3-6R1JCA-t500x500.jpg?ex=6a382c29&is=6a36daa9&hm=c741fed944f3f98b76eda90991318e4379e8b8c9ddb399c7395a477a5b6890b9&" class="avatar">
+                <h2 class="lock-title">جاهزه 😉</h2>
+                <p class="lock-sub">كل الي بينا هنا 😍</p>
+                
+                <div class="pass-box">
+                    <label>Password</label>
+                    <input type="text" id="password-input" placeholder="password">
+                    <p id="err-msg" style="color: red; font-size: 12px; text-align: center; margin-top: 8px; display: none; font-weight: bold;">الباسورد غلط يا روحي 💔</p>
+                </div>
+
+                <button class="btn-pink" onclick="checkPassword()">💖 Unlock 💖</button>
+            </div>
+        </div>
+
+        <!-- 2. شاشة الترحيب -->
+        <div id="screen-welcome" class="app-screen">
+            <div class="white-card">
+                <h1 id="typed-title" style="min-height: 45px; color: #d81b60; font-size: 32px; font-weight: 900; margin-bottom: 20px;"></h1>
+                <p id="typed-desc" style="min-height: 85px; color: #555; font-size: 18px; line-height: 1.8; font-weight: 600; margin-bottom: 30px;"></p>
+                <button id="welcome-next-btn" class="btn-pink" onclick="goToScreen('screen-timeline')" style="width: 70%; opacity: 0; pointer-events: none; transition: opacity 0.8s ease;">💖 next 💖</button>
+            </div>
+        </div>
+
+        <!-- 3. التايم لاين -->
+        <div id="screen-timeline" class="app-screen">
+            <div class="hero-section">
+                <img src="https://res.cloudinary.com/dvc3zpg1i/image/upload/v1774384432/clients/s90rnh7trja1q7fjaqh9.jpg" alt="Holding hands">
+                <div class="hero-badge">بحبك</div>
+            </div>
+
+            <div class="timeline-content">
+                <div class="counter-container">
+                    <div class="counter-title">سوا من 12-12-2022 ❤️</div>
+                    <div class="counter-grid">
+                        <div class="count-box"><div class="num" id="cd-days">0</div><div class="label">يوم</div></div>
+                        <div class="count-box"><div class="num" id="cd-hours">0</div><div class="label">ساعة</div></div>
+                        <div class="count-box"><div class="num" id="cd-mins">0</div><div class="label">دقيقة</div></div>
+                        <div class="count-box"><div class="num" id="cd-secs">0</div><div class="label">ثانية</div></div>
+                    </div>
+                    <div style="font-size: 13px; color: #888; font-weight: bold; margin-top: 18px;">كل ثانية بتعدي وانت في قلبي ❤️</div>
+                </div>
+
+                <div class="timeline-item">
+                    <h4>❤️ يوم ما قولتلِك بحبك</h4>
+                    <div class="date-pill"><i class="fa-regular fa-calendar"></i> 2022-12-12</div>
+                </div>
+                <div class="timeline-item">
+                    <h4>❤️ أول خروجة لينا سوا</h4>
+                    <div class="date-pill"><i class="fa-regular fa-calendar"></i> 2023-01-23</div>
+                </div>
+                <div class="timeline-item">
+                    <h4>❤️ ربنا وفقنا وي حطنا في نفس الكلية</h4>
+                    <div class="date-pill"><i class="fa-regular fa-calendar"></i> 2025-09-20</div>
+                </div>
+
+                <!-- رجعنا الألبوم هنا -->
+                <div class="gallery-grid">
+                    <img src="https://cdn.discordapp.com/attachments/711816136089403453/1518009914201739300/IMG-20260502-WA00691.jpg?ex=6a385c66&is=6a370ae6&hm=072cacaafa58cee689285e60d65a4aca772aafcc4bc3ec21f4ce5fc9496ab6dc&">
+                    <img src="https://cdn.discordapp.com/attachments/711816136089403453/1518009913555681390/IMG-20260502-WA01261.jpg?ex=6a385c66&is=6a370ae6&hm=a2b0c415fbf1cd1aae4c85998ff2ce2bccf37e4dfedd3634c846e93002badb9f&">
+                </div>
+            </div>
+
+            <!-- الزرار العائم (بدون أي خلفية بيضاء وراه) -->
+            <div class="sticky-footer">
+                <button class="btn-pink" onclick="goToScreen('screen-final')" style="width: 85%;">💖 message 💖</button>
+            </div>
+        </div>
+
+        <!-- 4. الشاشة الأخيرة -->
+        <div id="screen-final" class="app-screen">
+            <div class="white-card">
+                <div class="msg-list">
+                    <h3 id="fin-msg-1"></h3>
+                    <h3 id="fin-msg-2"></h3>
+                    <h3 id="fin-msg-3"></h3>
+                    <h3 id="fin-msg-4"></h3>
+                </div>
+                <button id="final-back-btn" class="btn-outline" onclick="goToScreen('screen-timeline')" style="opacity: 0; pointer-events: none;">memories 🔄</button>
+                <div style="color: #d81b60; font-weight: 900; margin-top: 25px; font-size: 18px;">💖 Lovely 💖</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const bgMusic = document.getElementById('background-music');
+        const musicBtn = document.getElementById('music-toggle-btn');
+
+        function typeWriter(text, el, speed, onDone) {
+            if (!el || !text) {
+                if(onDone) onDone();
+                return;
+            }
+            const chars = [...text];
+            let i = 0;
+            function step() {
+                if (i < chars.length) {
+                    el.innerHTML += chars[i];
+                    i++;
+                    setTimeout(step, speed);
+                } else if (onDone) {
+                    onDone();
+                }
+            }
+            step();
+        }
+
+        function startWelcomeTyping() {
+            const titleText = "ينور عيني";
+            const descText = "بحبك يا كلل ما ليا وي بعشقك وحقك عليا لو ضايقتك تعالي نفتكر كل حاجه بينا هنا يلا يا حياتي ❤️";
+
+            const titleEl = document.getElementById('typed-title');
+            const descEl = document.getElementById('typed-desc');
+            const nextBtn = document.getElementById('welcome-next-btn');
+
+            if(!titleEl || !descEl) return;
+            titleEl.innerHTML = ""; descEl.innerHTML = "";
+            nextBtn.style.opacity = "0"; nextBtn.style.pointerEvents = "none";
+
+            typeWriter(titleText, titleEl, 100, () => {
+                setTimeout(() => {
+                    typeWriter(descText, descEl, 42, () => {
+                        nextBtn.style.opacity = "1";
+                        nextBtn.style.pointerEvents = "auto";
+                    });
+                }, 350);
+            });
+        }
+
+        function startFinalTyping() {
+            const lines = [
+                "مهما هقولك بحبك قد اي مش هوفيكي حقك ",
+                "معاكِ الدنيا احلي كتير",
+                "بحبك اوييى ❤️",
+                "ربنا يخليكي ليا يا كل ما ليا❤️"
+            ];
+
+            const el1 = document.getElementById('fin-msg-1');
+            const el2 = document.getElementById('fin-msg-2');
+            const el3 = document.getElementById('fin-msg-3');
+            const el4 = document.getElementById('fin-msg-4');
+            const backBtn = document.getElementById('final-back-btn');
+
+            if(!el1) return;
+            el1.innerHTML = ""; el2.innerHTML = ""; el3.innerHTML = ""; el4.innerHTML = "";
+            backBtn.style.opacity = "0"; backBtn.style.pointerEvents = "none";
+
+            typeWriter(lines[0], el1, 45, () => {
+                setTimeout(() => {
+                    typeWriter(lines[1], el2, 45, () => {
+                        setTimeout(() => {
+                            typeWriter(lines[2], el3, 55, () => {
+                                setTimeout(() => {
+                                    typeWriter(lines[3], el4, 55, () => {
+                                        backBtn.style.opacity = "1";
+                                        backBtn.style.pointerEvents = "auto";
+                                    });
+                                }, 350);
+                            });
+                        }, 350);
+                    });
+                }, 350);
+            });
+        }
+
+        function checkPassword() {
+            const pass = document.getElementById('password-input').value.trim().toLowerCase();
+            if (pass === '12/12/2022') {
+                goToScreen('screen-welcome');
+                confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+
+                startWelcomeTyping();
+
+                if(bgMusic) bgMusic.play().catch(() => {});
+                if(musicBtn) musicBtn.style.display = 'flex';
+
+            } else {
+                document.getElementById('err-msg').style.display = 'block';
+            }
+        }
+
+        function toggleAudio() {
+            if(!bgMusic || !musicBtn) return;
+            const icon = musicBtn.querySelector('i');
+            if (bgMusic.paused) {
+                bgMusic.play();
+                icon.className = 'fa-solid fa-volume-high';
+                musicBtn.style.borderColor = '#ffccd5';
+            } else {
+                bgMusic.pause();
+                icon.className = 'fa-solid fa-volume-xmark';
+                musicBtn.style.borderColor = '#888';
+            }
+        }
+
+        function goToScreen(screenId) {
+            document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+            const target = document.getElementById(screenId);
+            if(target) target.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if(screenId === 'screen-final') {
+                startFinalTyping();
+            }
+        }
+
+        const startDate = new Date("2022-12-12T00:00:00");
+        
+        setInterval(() => {
+            const now = new Date();
+            const diff = now - startDate;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+
+            const dEl = document.getElementById('cd-days');
+            if(dEl) {
+                dEl.innerText = days;
+                document.getElementById('cd-hours').innerText = hours;
+                document.getElementById('cd-mins').innerText = mins;
+                document.getElementById('cd-secs').innerText = secs;
+            }
+        }, 1000);
+
+        setInterval(() => {
+            const heart = document.createElement('div');
+            heart.classList.add('floating-heart');
+            heart.innerHTML = ['❤️', '💖', '💕'][Math.floor(Math.random() * 3)];
+            heart.style.left = Math.random() * 100 + 'vw';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 4000);
+        }, 500);
+    </script>
+
+</body>
+</html>
